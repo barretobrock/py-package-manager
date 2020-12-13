@@ -28,21 +28,31 @@ PPM_ABS_PATH="$(
     cd "$(dirname "$0")" >/dev/null 2>&1
     pwd -P
 )"
-log "debug Found py-package-manager root directory at ${PPM_ABS_PATH}"
+echo "Found py-package-manager root directory at ${PPM_ABS_PATH}"
 
 # Import common variables / functions, handle argument collection
-log "debug Importing common variables..."
+echo "Importing common variables..."
 source ${PPM_ABS_PATH}/utils/common.sh
 
 log "debug Reading in config file..."
 if [[ -z ${CONFIG_PATH} ]]; then
+    # No file provided
     log "ERROR Please pass a path to the config.py file for your package"
+    exit 1
+elif [[ ! -f ${CONFIG_PATH} ]]; then
+    # File provided but doesn't exist
+    log "error The config.py file provided doesn't seem to exist at path: ${CONFIG_PATH}"
     exit 1
 else
     # Intake repo-specific variables
     # Get the dir of the CONFIG_PATH
-    CONFIG_DIR="$(basename "${CONFIG_PATH}")"
+    CONFIG_DIR="$(dirname "${CONFIG_PATH}")"
     AUTO_CONFIG_PATH="${CONFIG_DIR}/_auto_config.sh"
+    if [[ ! -f ${AUTO_CONFIG_PATH} ]]; then
+        # Config file not made but config.py file exists. Run the python script to build out the bash variables
+        log "debug auto_config.sh not found. Running Python script to build it."
+        python3 ${CONFIG_PATH}
+    fi
     log "debug Sourcing in the auto_config file at ${AUTO_CONFIG_PATH}"
     source ${AUTO_CONFIG_PATH}
 fi
@@ -51,12 +61,13 @@ fi
 # ------------------------------------------
 # Get highest tag number... if nothing found, start at 0.1.0
 log "debug Attempting to grab latest tag version at repo ${REPO_DIR}"
-CUR_VERSION=$(git -C ${REPO_DIR} describe --abbrev=0 --tags) || echo "0.1.0"
+CUR_VERSION=$(git -C ${REPO_DIR} describe --abbrev=0 --tags || echo "0.1.0")
 log "debug Got current version of ${CUR_VERSION}"
 NEW_VERSION="$(bump_version "${CUR_VERSION}")"
 
 CONFIRM="Updating ${RED}${REPO_NAME}${RST} ${BLU}${CUR_VERSION}${RST} to ${BLU}${NEW_VERSION}${RST}."
-read -p "Confirm (y/n): ${CONFIRM}" -n 1 -r
+#read -p """Confirm (y/n): ${CONFIRM}" -n 1 -r
+read -p "$(echo -e "Confirm (y/n): ${CONFIRM}")" -n 1 -r
 echo # (optional) move to a new line
 if [[ ${REPLY} =~ ^[Yy]$ ]]; then
     # Get current hash and see if it already has a tag
@@ -76,4 +87,4 @@ else
     log "info Aborted tag."
 fi
 
-announce_section "Process completed"
+log "info Process completed"

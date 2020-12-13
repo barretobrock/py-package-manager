@@ -28,21 +28,31 @@ PPM_ABS_PATH="$(
     cd "$(dirname "$0")" >/dev/null 2>&1
     pwd -P
 )"
-log "debug Found py-package-manager root directory at ${PPM_ABS_PATH}"
+echo "Found py-package-manager root directory at ${PPM_ABS_PATH}"
 
 # Import common variables / functions, handle argument collection
-log "debug Importing common variables..."
+echo "Importing common variables..."
 source ${PPM_ABS_PATH}/utils/common.sh
 
 log "debug Reading in config file..."
 if [[ -z ${CONFIG_PATH} ]]; then
+    # No file provided
     log "ERROR Please pass a path to the config.py file for your package"
+    exit 1
+elif [[ ! -f ${CONFIG_PATH} ]]; then
+    # File provided but doesn't exist
+    log "error The config.py file provided doesn't seem to exist at path: ${CONFIG_PATH}"
     exit 1
 else
     # Intake repo-specific variables
     # Get the dir of the CONFIG_PATH
-    CONFIG_DIR="$(basename "${CONFIG_PATH}")"
+    CONFIG_DIR="$(dirname "${CONFIG_PATH}")"
     AUTO_CONFIG_PATH="${CONFIG_DIR}/_auto_config.sh"
+    if [[ ! -f ${AUTO_CONFIG_PATH} ]]; then
+        # Config file not made but config.py file exists. Run the python script to build out the bash variables
+        log "debug auto_config.sh not found. Running Python script to build it."
+        python3 ${CONFIG_PATH}
+    fi
     log "debug Sourcing in the auto_config file at ${AUTO_CONFIG_PATH}"
     source ${AUTO_CONFIG_PATH}
 fi
