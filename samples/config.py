@@ -20,7 +20,7 @@ URL_TEMPLATE = 'https://github.com/barretobrock'
 URL = f'{URL_TEMPLATE}/{REPO_NAME}'
 GIT_URL = f'git+{URL}.git#egg={REPO_NAME}'
 VENV_PATH = f'${{HOME}}/venvs/{VENV_NAME}/bin/python3'
-DEP_TEMPLATE = f'git+{URL_TEMPLATE}/{{dep}}/tarball/master#egg={{dep}}'
+DEP_TEMPLATE = f'git+{URL_TEMPLATE}/{{dep}}.git#egg={{dep}}'
 DEP_LINKS = [DEP_TEMPLATE.format(dep=x) for x in MY_DEPS]
 
 # ==============================================================================
@@ -56,8 +56,8 @@ if __name__ == '__main__':
             write_str = ''
             if isinstance(v, list):
                 # Add line breaks/tabs to strong
-                line_str = ''.join([f'\n\t{x}' for x in v])
+                line_str = ''.join([f'\n\t"{x}"' for x in v])
                 write_str += f'{k}=({line_str}\n)'
             else:
-                write_str += f'{k}={v}'
+                write_str += f'{k}="{v}"'
             f.write(f'{write_str}\n')
