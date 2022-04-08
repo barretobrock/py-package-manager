@@ -18,19 +18,12 @@
 #/      CHANGELOG_PATH
 #/      VENV_PATH
 #/ -------------------------------------
-
-# INPUTS
-# Command to use (bump|pull|push)
-#   bump - bump version, update CHANGELOG
-#   pull - pull down changes & reinstall
-#   push - push changes to remote & tag
-CMD=${1:update}
-# Get the level to increment on (major|minor|patch)
-LEVEL=${2:-patch}
+NAME="PyPackageManager"
+VERSION='1.0.1'
 
 # Absolute path for this script
 PPM_ABS_PATH="$(
-    cd "$(dirname "$0")" >/dev/null 2>&1
+    cd "$(dirname "$0")" >/dev/null
     pwd -P
 )"
 COMMON_SH="${PPM_ABS_PATH}/utils/common.sh"
@@ -43,7 +36,19 @@ fi
 
 source ${COMMON_SH}
 
+# These might not need to change from project to project
+PROJECT_DIR="${HOME}/extras/${PROJECT}"
+VERSION_FPATH="${PROJECT_DIR}/${PY_LIB_NAME}/__init__.py"
+PYPROJECT_TOML_FPATH="${PROJECT_DIR}/pyproject.toml"
+CHANGELOG_PATH="${PROJECT_DIR}/CHANGELOG.md"
+VENV_PATH="${HOME}/venvs/${VENV_NAME}/bin/python3"
+
 announce_section "Scanning for needed files..."
+if [[ ! -d ${PROJECT_DIR} ]]
+then
+    make_log "error The project directory at path '${PROJECT_DIR}' was not found."
+fi
+
 NEEDED_FILES=(
     ${VERSION_FPATH}
     ${PYPROJECT_TOML_FPATH}
@@ -51,7 +56,7 @@ NEEDED_FILES=(
     ${VENV_PATH}
 )
 for p in "${NEEDED_FILES[@]}"; do
-    if [ ! -f "${p}" ]
+    if [[ ! -f "${p}" ]]
     then
         make_log "error Missing file at path: '${p}' Cannot proceed." && exit 1
     else
@@ -59,7 +64,7 @@ for p in "${NEEDED_FILES[@]}"; do
     fi
 done
 
-announce_section "Handling command..."
+announce_section "Handling command '${CMD}'..."
 if [[ ${CMD} == 'bump' ]]
 then
     # Get current version and calculate the new version based on level input

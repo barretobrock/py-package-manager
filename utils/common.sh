@@ -153,3 +153,69 @@ announce_section () {
     COLOR=${2:-${BLU}}
     printf "${COLOR}${SECTION_BRK}\n${SECTION}\n${SECTION_BRK}${RST}\n"
 }
+
+arg_parse() {
+    # Parses arguments from command line
+    POSITIONAL=()
+    while [[ $# -gt 0 ]]
+    do
+        key="$1"
+        case ${key} in
+             -v|--version)   # Print script name & version
+                announce_section "${NAME}\n${VERSION}"
+                exit 0
+                ;;
+            -c|--cmd)
+                CMD=${2:-bump}
+                make_log "debug Received command: ${CMD}"
+                shift # past argument
+                shift # past value
+                ;;
+            -d|--debug)
+                make_log "debug Setting debug to TRUE."
+                DEBUG_LOG=1
+                shift # past argument
+                ;;
+            -l|--level)
+                LEVEL=${2:-patch}
+                make_log "debug Received level argument: ${LEVEL}"
+                shift # past argument
+                shift # past value
+                ;;
+            --project)
+                PROJECT=${2}
+                make_log "debug received project argument: ${PROJECT}"
+                shift # past argument
+                shift # past value
+                ;;
+            --lib)
+                PY_LIB_NAME=${2}
+                make_log "debug received py lib argument: ${PY_LIB_NAME}"
+                shift # past argument
+                shift # past value
+                ;;
+            --venv)
+                VENV_NAME=${2}
+                make_log "debug received venv argument: ${VENV_NAME}"
+                shift # past argument
+                shift # past value
+                ;;
+            --main-branch)
+                MAIN_BRANCH=${2}
+                make_log "debug received main git branch argument: ${MAIN_BRANCH}"
+                shift # past argument
+                shift # past value
+                ;;
+            *)    # unknown option
+                POSITIONAL+=("$1") # save it in an array for later
+                shift # past argument
+                ;;
+    esac
+    done
+    set -- "${POSITIONAL[@]}" # restore positional parameters
+    # Check for unknown arguments passed in (if positional isn't empty)
+    [[ ! -z "${POSITIONAL}" ]] && echo "Unknown args passed: ${POSITIONAL[@]}" && exit 1
+}
+
+# Collect arguments when this is called
+arg_parse "$@"
