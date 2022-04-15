@@ -105,7 +105,7 @@ then
     make_log "debug Pulling updates from remote ${RED}${MAIN_BRANCH}${RESET}..."
     (git -C $PROJECT_DIR pull origin ${MAIN_BRANCH})
     make_log "info Beginning update of ${PROJECT}..."
-    ${VENV_PATH} -m pip install .
+    ${VENV_PATH} -m pip install --upgrade --upgrade-strategy eager .
     if [[ -d "${PROJECT_DIR}/crons" ]]
     then
         CRON_DIR="${PROJECT_DIR}/crons"

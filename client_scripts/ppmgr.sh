@@ -27,7 +27,7 @@ PPM_PATH=../py-package-manager/ppm_main.sh
 
 echo "Received ${CMD} and ${LEVEL}"
 
-if [[ ! -z "${PPM_PATH}" ]]
+if [[ -s "${PPM_PATH}" ]]
 then
     sh ${PPM_PATH} -d --level ${LEVEL} --project ${PROJECT} --cmd ${CMD} --lib ${PY_LIB_NAME} --venv ${VENV_NAME} --main-branch ${MAIN_BRANCH}
 else
