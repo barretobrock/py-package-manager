@@ -19,7 +19,7 @@
 #/      VENV_PATH
 #/ -------------------------------------
 NAME="PyPackageManager"
-VERSION='1.0.1'
+VERSION='1.0.2'
 
 # Absolute path for this script
 PPM_ABS_PATH="$(
@@ -113,8 +113,8 @@ then
         make_log "debug Checking for crontab updates for ${HOSTNAME}"
         CRON_FILE=${CRON_DIR}/${HOSTNAME}.sh
         SUDO_CRON_FILE=${CRON_DIR}/su-${HOSTNAME}.sh
-        [[ -f ${CRON_FILE} ]] && log "debug Applying cron file." && crontab ${CRON_FILE} || log "debug No cron file."
-        [[ -f ${SUDO_CRON_FILE} ]] && log "debug Applying sudo cron file." && sudo crontab ${SUDO_CRON_FILE} || log "debug No sudo cron file."
+        [[ -f ${CRON_FILE} ]] && make_log "debug Applying cron file." && crontab ${CRON_FILE} || make_log "debug No cron file."
+        [[ -f ${SUDO_CRON_FILE} ]] && make_log "debug Applying sudo cron file." && sudo crontab ${SUDO_CRON_FILE} || make_log "debug No sudo cron file."
         make_log "debug Cron updates completed."
     fi
 elif [[ ${CMD} == 'push' ]]
