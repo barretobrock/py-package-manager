@@ -7,31 +7,29 @@
 #/      >>> sh version_bump.sh minor        # The sophisticated minor
 #/      >>> sh version_bump.sh major        # The cultivated major
 #/
-#/  REQUIRED VARAIBLES
-#/      GIT_GROUP - the group/person who owns the project
-#/      PROJECT - the project name
-#/      VENV_NAME - virtual environment name in ~/venvs/
-#/      MAIN_BRANCH - name of the main branch in the repo (main|master)
-#/      PROJECT_DIR - the local directory the repo lives in
-#/      VERSION_FPATH - file path to the
-#/      PYPROJECT_TOML_FPATH
-#/      CHANGELOG_PATH
-#/      VENV_PATH
+#/  REQUIRED VARIABLES
+#/      PROJECT -       the project name
+#/      PY_LIB_NAME -   the library name in the project
+#/      VENV_NAME -     virtual environment name in ~/venvs/
+#/      MAIN_BRANCH -   name of the main branch in the repo (main|master)
 #/ -------------------------------------
 NAME="PyPackageManager"
-VERSION='1.0.2'
+VERSION='2.0.0'
 
-# Absolute path for this script
-PPM_ABS_PATH="$(
-    cd "$(dirname "$0")" >/dev/null
-    pwd -P
-)"
+# We need the absolute path var for this script
+if [[ -z "${PPM_ABS_PATH}" ]]
+then
+    echo "Missing PPM_ABS_PATH variable. Please run ppm_init.sh to add the variable to your ~/.*shrc file."
+    exit 1
+fi
+
 COMMON_SH="${PPM_ABS_PATH}/utils/common.sh"
 if [[ -f "${COMMON_SH}" ]]
 then
     echo "Found py-package-manager root directory at ${PPM_ABS_PATH}"
 else
-    echo "Failed to find PPM directory/common_methods file. (Looked at ${COMMON_SH}) Aborting..." && exit 1
+    echo "Failed to find PPM directory/common_methods file. (Looked at ${COMMON_SH}) Aborting..."
+    exit 1
 fi
 
 source ${COMMON_SH}
@@ -47,6 +45,7 @@ announce_section "Scanning for needed files..."
 if [[ ! -d ${PROJECT_DIR} ]]
 then
     make_log "error The project directory at path '${PROJECT_DIR}' was not found."
+    exit 1
 fi
 
 NEEDED_FILES=(
