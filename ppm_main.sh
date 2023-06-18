@@ -23,12 +23,13 @@ then
     exit 1
 fi
 
-COMMON_SH="${PPM_ABS_PATH}/utils/common.sh"
+PPM_DIR_PATH="$(dirname ${PPM_ABS_PATH})"
+COMMON_SH="${PPM_DIR_PATH}/utils/common.sh"
 if [[ -f "${COMMON_SH}" ]]
 then
-    echo "Found py-package-manager root directory at ${PPM_ABS_PATH}"
+    echo "Found py-package-manager root directory at ${PPM_DIR_PATH}"
 else
-    echo "Failed to find PPM directory/common_methods file. (Looked at ${COMMON_SH}) Aborting..."
+    echo "Failed to find PPM directory/common_methods file. (Looked at ${PPM_DIR_PATH}) Aborting..."
     exit 1
 fi
 
@@ -92,7 +93,7 @@ then
         make_log "debug Inserting new area in CHANGELOG for version..."
         sed -i.bak "/__BEGIN-CHANGELOG__/a ${CHGLOG_STR}" ${CHANGELOG_PATH}
         make_log "info New version is ${RED}${NEW_VERSION}${RESET}"
-        make_log "info To finish, fill in CHANGELOG details and then ${RED}sh ppmgr.sh push${RESET}"
+        make_log "info To finish, fill in CHANGELOG details and then ${RED}make push${RESET}"
     else
         make_log "info Cancelled procedure"
     fi
